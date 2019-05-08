@@ -1,0 +1,22 @@
+version: '3'
+
+services: 
+    web:
+      build:
+        context: ./ 
+        dockerfile: ./app/DockerFile
+      command: python manage.py runserver 0.0.0.0:8000
+      volumes:
+        - ./app:/app
+      ports:
+        - "8000:8000"
+    client:
+      build:
+        context: ./
+        dockerfile: ./client/Dockerfile
+      command: yarn start
+      volumes:
+        - ./client/src:/app/src
+        - ./client/public:/app/public
+      ports:
+        - "3000:3000"
