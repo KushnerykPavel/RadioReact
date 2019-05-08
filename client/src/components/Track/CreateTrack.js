@@ -97,7 +97,7 @@ const CreateTrack = ({ classes }) => {
           className={classes.dialog}
         >
           <form onSubmit={ event => handleSubmit(event, createTrack)}>
-            <DialogTitle>CreateTrack</DialogTitle>
+            <DialogTitle>Create Track</DialogTitle>
             <DialogContent>
               <DialogContentText>
                 Add a Title, Description & Audio File

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Mutation } from 'react-apollo';
 import { gql } from 'apollo-boost';
 import axios from 'axios';
@@ -14,18 +14,25 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import FormControl from "@material-ui/core/FormControl";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import AddIcon from "@material-ui/icons/Add";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import LibraryMusicIcon from "@material-ui/icons/LibraryMusic";
 
-const UpdateTrack = ({ classes }) => {
+import { GET_TRACKS_QUERY } from '../../pages/App'
+import { UserContext } from '../../Root'
+import Error from "../Shared/Error";
 
+const UpdateTrack = ({ classes, track }) => {
+  const currentUser = useContext(UserContext)
   const [open, setOpen ] = useState(false)
-  const [title, setTitle ] = useState("")
-  const [description, setDescription ] = useState("")
+  const [title, setTitle ] = useState(track.title)
+  const [description, setDescription ] = useState(track.description)
   const [file, setFile ] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [fileError, setFileError] = useState("")
+  const isCurrentUser = currentUser.id === track.postedBy.id
 
+  
   const handleAudioChange = event => {
     const selectedFile = event.target.files[0]
     const fileSizeLimit = 10000000;
@@ -45,6 +52,7 @@ const UpdateTrack = ({ classes }) => {
       data.append('resource_type', 'raw')
       data.append('upload_preset', 'reactTracks')
       data.append('cloud_name', 'kushneryk') 
+      console.log(file)
       const res = await axios.post('https://api.cloudinary.com/v1_1/kushneryk/raw/upload', data )
       return res.data.url
     } catch (err) {
@@ -54,28 +62,23 @@ const UpdateTrack = ({ classes }) => {
     
   }
 
-  const handleSubmit = async (event, createTrack) => {
+  const handleSubmit = async (event, updateTrack) => {
     event.preventDefault();
     setSubmitting(true)
     // upload our audio file.
     const url = await handleAudioUpload()
     console.log(url)
-    createTrack({variables: { title, description, url}})
+    updateTrack({variables: { trackId: track.id, title, description, url}})
   }
 
-  return (
+  return isCurrentUser && (
     <>
-    <Button 
-      onClick={() => setOpen(true)}
-      variant="fab"
-      className={classes.fab}
-      color="secondary" 
-     > 
-      <AddIcon />
-    </Button>
+    <IconButton onClick={() => setOpen(true)}>
+      <EditIcon />
+    </IconButton>
 
     <Mutation 
-      mutation={CREATE_TRACK_MUTATION}
+      mutation={UPDATE_TRACK_MUTATION}
       onCompleted={data => {
         console.log({data})
         setSubmitting(false)
@@ -84,17 +87,17 @@ const UpdateTrack = ({ classes }) => {
         setDescription("")
         setFile("")
       }}
-      refetchQueries = {() => [{ query: GET_TRACKS_QUERY}]}
+     // refetchQueries = {() => [{ query: GET_TRACKS_QUERY}]}
     >
-      {(createTrack, {loading, error}) => {
+      {(updateTrack, {loading, error}) => {
         if (error ) return <Error error={error} />
         return (
           <Dialog
           open={open} 
           className={classes.dialog}
         >
-          <form onSubmit={ event => handleSubmit(event, createTrack)}>
-            <DialogTitle>CreateTrack</DialogTitle>
+          <form onSubmit={ event => handleSubmit(event, updateTrack)}>
+            <DialogTitle>Update Track</DialogTitle>
             <DialogContent>
               <DialogContentText>
                 Add a Title, Description & Audio File
@@ -158,7 +161,7 @@ const UpdateTrack = ({ classes }) => {
                 type="submit"
                 className={classes.save}
               >
-                { submitting ? ( <CircularProgress className={classes.save} size={24} />) : ("Add Track")}
+                { submitting ? ( <CircularProgress className={classes.save} size={24} />) : ("Update Track")}
               </Button>
             </DialogActions>
           </form>
@@ -170,6 +173,31 @@ const UpdateTrack = ({ classes }) => {
     </>
   )
 };
+
+const UPDATE_TRACK_MUTATION = gql`
+  mutation($trackId: Int!, $title: String, $description: String, $url: String ) {
+    updateTrack(
+      trackId: $trackId, 
+      title: $title,
+      description: $description,
+      url: $url
+    ) {
+      track {
+        id
+        title
+        description
+        url
+        likes {
+          id
+        }
+        postedBy {
+          id
+          username
+        }
+      }
+    }
+  }
+`
 
 const styles = theme => ({
   container: {
