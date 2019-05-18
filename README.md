@@ -1,6 +1,6 @@
 **Radio player on built with Python, GraphQL, Django, and ReactJS.**
 
-![Track List](list.jpg "Track List")
+![Track List](list.png "Track List")
 
 **Installation** 
 
