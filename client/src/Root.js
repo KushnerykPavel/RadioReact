@@ -16,34 +16,39 @@ import Error from './components/Shared/Error'
 export const UserContext = React.createContext()
 
 const Root = () => (
-    <Query query={ME_QUERT}>
-        {({data, loading, error}) => {
+    <Query query={ME_QUERY}>
+        {({ data, loading, error }) => {
             if (loading) return <Loading />
-            if (error) return <Error error={ error }/>
-            
+            if (error) return <Error error={error} />
+
             const currentUser = data.me
 
             return (
                 <Router>
                     <UserContext.Provider value={currentUser}>
-                    <Header currentUser={ currentUser } />
-                    <Switch>
-                      <Route exact path="/" component={ App }></Route>
-                      <Route path="/profile/:id" component={ Profile } />
-                    </Switch>
+                        <Header currentUser={currentUser} />
+                        <Switch>
+                            <Route exact path="/" component={App}></Route>
+                            <Route path="/profile/:id" component={Profile} />
+                        </Switch>
                     </UserContext.Provider>
-                </Router>    
+                </Router>
             )
         }}
     </Query>
 )
 
-const ME_QUERT = gql`
+export const ME_QUERY = gql`
     {
         me {
             id 
             username
             email
+            likeSet {
+                track {
+                    id
+                }
+            }
         }
     }
 `

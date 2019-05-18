@@ -10,16 +10,16 @@ import { GET_TRACKS_QUERY } from '../../pages/App'
 const DeleteTrack = ({ track }) => {
   const currentUser = useContext(UserContext)
   const isCurrentUser = currentUser.id === track.postedBy.id
-  
+
 
   return isCurrentUser && (
-    <Mutation 
+    <Mutation
       mutation={DELETE_TRACK_MUTATION}
-      variables ={{ trackId: track.id }}
+      variables={{ trackId: track.id }}
       onCompleted={data => {
-        console.log({data});
+        console.log({ data });
       }}
-      refetchQueries={() => [{ query: GET_TRACKS_QUERY}]}
+      refetchQueries={() => [{ query: GET_TRACKS_QUERY }]}
     >
       {deleteTrack => (
         <IconButton onClick={deleteTrack}>

@@ -19,41 +19,41 @@ import UpdateTrack from './UpdateTrack';
 
 const TrackList = ({ classes, tracks }) => (
   <List>
-    {tracks.map( track => (
-     <ExpansionPanel key={track.id}>
-      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-        <ListItem className={classes.root}>
-          <LikeTrack />
-          <ListItemText
-            primaryTypographyProps={{
-              variant: "subheading",
-              color: "primary"
-            }} 
-            primary={track.title}
-            secondary={
-              <Link 
-                className={classes.link}
-                to={`/profile/${track.postedBy.id}`}
-              >
-                {track.postedBy.username}
-              </Link>
-            } 
-          />
-          <AudioPlayer url={track.url} />
-        </ListItem>
-      </ExpansionPanelSummary>
-      <ExpansionPanelDetails className={classes.details}>
+    {tracks.map(track => (
+      <ExpansionPanel key={track.id}>
+        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+          <ListItem className={classes.root}>
+            <LikeTrack trackId={track.id} likeCount={track.likes.length} />
+            <ListItemText
+              primaryTypographyProps={{
+                variant: "subheading",
+                color: "primary"
+              }}
+              primary={track.title}
+              secondary={
+                <Link
+                  className={classes.link}
+                  to={`/profile/${track.postedBy.id}`}
+                >
+                  {track.postedBy.username}
+                </Link>
+              }
+            />
+            <AudioPlayer url={track.url} />
+          </ListItem>
+        </ExpansionPanelSummary>
+        <ExpansionPanelDetails className={classes.details}>
           <Typography
             variant="body1"
           >
             {track.description}
           </Typography>
-      </ExpansionPanelDetails>
-      <ExpansionPanelActions>
-        <UpdateTrack track={track}/>
-        <DeleteTrack track={track}/>
-      </ExpansionPanelActions>
-     </ExpansionPanel> 
+        </ExpansionPanelDetails>
+        <ExpansionPanelActions>
+          <UpdateTrack track={track} />
+          <DeleteTrack track={track} />
+        </ExpansionPanelActions>
+      </ExpansionPanel>
     ))}
   </List>
 )
